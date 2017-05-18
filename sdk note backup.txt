@@ -1,0 +1,150 @@
+gst-launch-1.0 filesrc location=/mnt/host/4k_30p.mp4 blocksize=32768 ! queue ! qtdemux name=demux demux.video_0 ! maru_h264dec ! fakesink sync =false
+gst-launch-1.0 filesrc location=/mnt/host/4k_30p.mp4 ! qtdemux name=demux demux.video_0 ! maru_h264dec ! fakesink sync =false
+
+
+
+gst-launch-1.0 filesrc location=/mnt/host/4k_30p.mp4 ! qtdemux name=demux demux.video_0 ! marudec_h264 ! directvideosink
+gst-launch-1.0 filesrc location=/mnt/host/1920x1080.mp4 ! qtdemux name=demux demux.video_0 ! marudec_h264 ! directvideosink
+gst-launch-1.0 filesrc location=/mnt/host/F-5.mp4 ! qtdemux name=demux demux.video_0 ! marudec_h264 ! directvideosink
+
+gst-launch-1.0 filesrc location=/mnt/host/VC1_1440x1080.wmv ! asfdemux name=demux demux.video_0 ! marudec_wmv3 ! directvideosink
+gst-launch-1.0 filesrc location=/mnt/host/VC1_1440x1080.wmv ! asfdemux name=demux demux.video_0 ! marudec_vc1 ! directvideosink
+
+gst-launch-1.0 filesrc location=/mnt/host/1920x1080.mp4 ! ffdemux_mov_mp4_m4a_3gp_3g2_mj2 ! marudec_h264 ! directvideosink
+
+
+[IP config]
+dc-fe-07-13-cc-e3
+109.123.120.206
+
+
+[h265]
+gst-launch-1.0 filesrc location=/mnt/host/640x480_h265.mp4 ! ffdemux_mov_mp4_m4a_3gp_3g2_mj2 ! marudec_hevc ! directvideosink
+gst-launch-1.0 filesrc location=/mnt/host/4k_265.mp4 ! ffdemux_mov_mp4_m4a_3gp_3g2_mj2 ! marudec_hevc ! directvideosink
+
+
+[build opengl sample]
+gcc test.c -o test -I/usr/lib/x86_64-linux-gnu/include/ -lX11 -lGL -lGLU -ldl -lva
+gcc test.c -o test  -lX11 -lGL -lGLU -ldl -lva
+(change /usr/lib/x86_64-linux-gun to gcc path if va/va.h not found)
+g++ example.cpp -o example -lX11 -lGL -lGLU -ldl -lglut
+
+gcc -D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600 -std=c11 -fomit-frame-pointer -pthread test.c -o test
+
+
+[libva]
+sudo apt-get install libva1 vainfo libva-dev libdrm-dev libgl1-mesa-dev
+
+
+1. modify configure file  near line:885 lindir(delete "/lib")
+2. ./configure --prefix="/usr/lib/x86_64-linux-gnu"
+
+
+cat /mnt/host/4k_30p.mp4 | gst-launch-1.0 -v fdsrc blocksize=32768 ! queue ! qtdemux name=demux demux.video_0 ! maru_h264dec ! fakesink sync =false
+
+
+dlogutil tizen-emul
+dlogutil MM_PLAYER &
+dlogutil MM_PLAYER WRT_PLUGINS/TIZEN &
+dlogutil WRT_PLUGINS/TIZEN WRT_PLUGINS/AVPLAY &
+dlogutil BLUETOOTH_FRWK BT_OAL BT_FRWK_SVC &
+
+
+wrt-launcher -s FNELuEd3AN.AVPlaytestV022 -d
+pkgcmd -i -t wgt -p AV -q
+pkgcmd -u -n jWt3HAdiB6
+
+curl --dns-servers 8.8.8.8 http://s3.amazonaws.com/eden-accelerator/SRPOL/videoSources.json
+
+cp /var/log/Xorg.0.log /mnt/host/Xorg.0.log
+max-size-buffers
+
+--enable-vaapi --enable-hwaccel=h264_vaapi --enable-hwaccel=mpeg2_vaapi --enable-hwaccel=vc1_vaapi --enable-hwaccel=wmv3_vaapi \
+--enable-dxva2 --enable-hwaccel=h264_dxva2 --enable-hwaccel=mpeg2_dxva2 --enable-hwaccel=vc1_dxva2 --enable-hwaccel=wmv3_dxva2 \
+
+export GST_DEBUG=*:2;dlogutil GST_LOG -v time&
+export GST_DEBUG=tizen-emul:5;dlogutil GST_LOG -v time&
+export GST_DEBUG=filesrc:1;dlogutil GST_LOG -v time&
+export GST_DEBUG=basesrc:1,GST_PADS:1,tizen-emul:1;dlogutil GST_LOG -v time&
+export GST_DEBUG=fdsrc:5;dlogutil GST_LOG -v time&
+export GST_DEBUG=qtdemux:5;dlogutil GST_LOG -v time&
+export GST_DEBUG=tvvideosink:5;dlogutil GST_LOG -v time&
+
+GST_DEBUG categorys:
+fdsrc
+filesrc
+basesrc
+qtdemux
+tizen-emul
+GST_PADS
+tvvideosink
+
+
+disk read speed test:
+time dd if=/mnt/host/4k_30p.mp4 of=/dev/null bs=8k count=30000
+sudo time dd if=/home/zhuxn/yinpeng/shared/4k_30p.mp4 of=/dev/null bs=8k count=30000 iflag=nocache
+
+disk write speed test
+time dd if=/dev/zero of=test bs=8k count=30000
+sudo time dd if=/dev/zero of=test bs=8k count=30000 oflag=nocache
+
+
+[h265]
+ffmpeg -vaapi_device /dev/dri/renderD128 -i <inputfile> -vf 'format=nv12,hwupload' -c:v hevc_vaapi <outfile>.mkv
+
+
+export CFLAGS+=" -Wall -g -fPIC -DGST_BASEPARSE_MODIFICATION -DGST_QUEUE_ENHANCEMENT -DGST_EXT_TYPEFIND -DGST_EXT_BUFFFERING_ENHANCEMENT -DGST_EXT_NO_DROP_PROPERTY -DGST_TIZEN_MODIFICATION"
+
+./configure --prefix=/usr/local --disable-nls --enable-static --disable-gobject-cast-checks --enable-binary-registry --disable-loadsave --disable-trace --disable-trace --disable-docbook --disable-gtk-doc --enable-dlog --with-html-dir=/tmp/dump 
+
+
+[tizen qemu packages]
+sudo apt-get install --yes libsdl1.2-dev libasound2-dev libxcomposite-dev libv4l-dev python ant libcurl4-gnutls-dev libcap-dev libattr1-dev libpixman-1-dev bcc libva-dev
+
+[android build envrionment]
+sudo apt-get install gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev ccache libgl1-mesa-dev libxml2-utils xsltproc unzip
+
+[android kernel git]
+git clone https://aosp.tuna.tsinghua.edu.cn/kernel/goldfish.git
+
+
+[emulator_windows_complie]
+export PATH=/opt/mingw32/bin:$PATH
+export TIZEN_SDK_DEV_PATH=$HOME/tizen-sdk-dev
+export CROSS_PREFIX=i686-w64-mingw32
+
+export PATH=/opt/mingw64/bin:$PATH
+export TIZEN_SDK_DEV_PATH=$HOME/tizen-sdk-dev
+export CROSS_PREFIX=x86_64-w64-mingw32
+
+CC=/opt/mingw32/bin/i686-w64-mingw32-gcc CROSS_PREFIX=${CROSS_PREFIX} PKG_CONFIG=/opt/mingw32/bin/i686-w64-mingw32-pkg-config ./build.sh 
+
+217**sDK
+
+
+[FFMPEG cross compile]
+./configure --disable-static --enable-shared --enable-w32threads --enable-cross-compile --target-os=mingw32 --arch=x86 --cross-prefix=i686-w64-mingw32- --enable-runtime-cpudetect --enable-dxva2 --enable-hwaccel=h264_dxva2 --enable-hwaccel=hevc_dxva2 
+
+
+
+[BullsEye]
+export PATH=/opt/BullseyeCoverage/bin:$PATH
+export COVFILE=/home/yinpeng/test.cov
+
+
+
+[build qemu on mac]
+based on qt version 5.7
+1 force cxx to cxx="clang++ -std=c++11 -stdlib=libc++" in configure file
+2 change "--extra-ldfalgs=-lstdc++" to "--extra-ldflags=-lc++" in emulator_configure.sh 
+2 modify Qt5Gui.pc add full subdir: Qt5Gui/5.3.2/QtGui
+3 add moc path to PATH
+5 enable hax of qemu by manual
+
+
+
+
+sudo ifconfig eth0 down
+sudo ifconfig eth0 hw ether 
+sudo ifconfig eth0 up
+
